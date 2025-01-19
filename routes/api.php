@@ -34,19 +34,14 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     // BudgetController routes
     Route::controller(BudgetController::class)->group(function () {
-        Route::get('/totals', 'getTotals');
+        Route::get('/get-incomes', 'getIncomes');
+        Route::get('/get-expenses', 'getExpenses');
+        Route::get('/get-savings', 'getSavings');
+        Route::get('/get-taxes', 'getTaxes');
         Route::post('/incomes', 'saveIncome');
         Route::post('/expenses', 'saveExpense');
         Route::post('/savings', 'saveSaving');
         Route::post('/taxes', 'saveTax');
-    });
-
-    // TransactionController routes
-    Route::controller(TransactionController::class)->group(function () {
-        Route::get('/transactions', 'index');
-        Route::post('/transactions', 'store');
-        Route::put('/transactions/{id}', 'update');
-        Route::delete('/transactions/{id}', 'destroy');
     });
 
     // BlogController routes
@@ -61,6 +56,8 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::get('/net-worth', 'getNetWorth');
         Route::post('/net-worth', 'storeNetWorth');
         Route::post('/net-worth/{id}', 'updateNetWorth');
+        Route::delete('/net-worth/{id}', 'destroyNetWorth');
+        Route::delete('/bulk-delete-net-worth', 'bulkDeleteNetWorth');
     });
 
 });
