@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use Exception;
+use Carbon\Carbon;
 use App\Models\Tax;
 use App\Models\Income;
 use App\Models\Saving;
@@ -626,8 +627,8 @@ class BudgetController extends Controller
                     'percentage_total' => 0,
                 ],
                 [
-                    'type' => 'User  Defined Other',
-                    'name' => 'User  Defined Other',
+                    'type' => 'User Defined Other',
+                    'name' => 'User Defined Other',
                     'monthly_amount' => 0,
                     'annual_amount' => 0,
                     'percentage_total' => 0,
@@ -635,7 +636,8 @@ class BudgetController extends Controller
             ];
 
             // Fetch records from the database
-            $records = $model::where('year', $validated['year'])
+            $records = $model::where('user_id', auth()->user()->id)
+                ->where('year', $validated['year'])
                 ->where('month', $validated['month'])
                 ->select('type', 'name', DB::raw('round(monthly_amount) as monthly_amount'), DB::raw('round(annual_amount) as annual_amount'), 'percentage_total')
                 ->get()
@@ -780,7 +782,8 @@ class BudgetController extends Controller
             $totals = $this->getTotalsByModel($model, $validated);
 
             // fetch records
-            $records = $model::where('year', $validated['year'])
+            $records = $model::where('user_id', auth()->user()->id)
+                ->where('year', $validated['year'])
                 ->where('month', $validated['month'])
                 ->select('type', DB::raw('round(monthly_amount) as monthly_amount'), DB::raw('round(annual_amount) as annual_amount'), 'percentage_total')
                 ->get();
@@ -809,6 +812,7 @@ class BudgetController extends Controller
     private function getTotalsByModel($model, $validated)
     {
         $data = $model::selectRaw('year, round(SUM(monthly_amount)) as total_monthly, round(SUM(annual_amount)) as total_annual, round(SUM(percentage_total)) as percentage_of_total')
+            ->where('user_id', auth()->id())
             ->where('year', $validated['year'])
             ->where('month', $validated['month'])
             ->groupBy('year')
@@ -832,6 +836,7 @@ class BudgetController extends Controller
     private function getTotalsByType($model, $validated)
     {
         $data = $model::selectRaw('type, round(SUM(monthly_amount)) as total_monthly, round(SUM(annual_amount)) as total_annual, round(SUM(percentage_total)) as percentage_of_total')
+            ->where('user_id', auth()->id())
             ->where('year', $validated['year'])
             ->where('month', $validated['month'])
             ->groupBy('type')
